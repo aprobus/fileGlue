@@ -3,6 +3,7 @@
   "name": "fileGlue",
   "description": "Module for both splitting files into smaller pieces, and combining them back together again",
   "version": "0.0.1",
+  "main": "./index",
   "repository": {
     "type": "git",
     "url": ""
