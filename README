@@ -14,3 +14,4 @@ fileGlue.tear(filePath, tearSize, callback)
   filePath: File to tear apart
   tearSize: Specifies the maximum size, in bytes, of the generated files
   callback: Call after completion as "callback (error)"
+  *Note* Generated files are output to the directory of the supplied file. ex: test.txt -> test.txt.0001.chunk
