@@ -1,1 +1,1 @@
-module.exports = require('lib/fileGlue');
+module.exports = require('./lib/fileGlue');
