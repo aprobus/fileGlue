@@ -6,7 +6,7 @@
   "main": "./index",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/aprobus/fileGlue"
   },
   "engines": {
     "node": "~0.7.7"
