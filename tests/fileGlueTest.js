@@ -10,7 +10,7 @@ vows.describe('File Glue').addBatch({
   'Tearing a file apart': {
     topic: function () {
       testFilePath = path.join(testFilesDir, 'simple.txt');
-      fileGlue.tearFile(testFilePath, 8, this.callback);
+      fileGlue.tear(testFilePath, 8, this.callback);
     },
 
     'no error': function (err) {
@@ -45,7 +45,7 @@ vows.describe('File Glue').addBatch({
 
       var outputPath = path.join(testFilesDir, 'rando.txt');
 
-      fileGlue.glueFile(fileChunks, outputPath, function (err) {
+      fileGlue.glue(fileChunks, outputPath, function (err) {
         if (err) {
           return self.callback(err);
         }
