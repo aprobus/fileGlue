@@ -11,7 +11,11 @@ fileGlue.glue(filePaths, outputFilePath, function (err) {
   //Files have now been 'glued' together, and written to outputFilePath
 });
 
-fileGlue.tear(filePath, tearSize, function (err) {
+var options = {
+  tearSize: 8, //Number of bytes per output file
+  readSize: 1024 //Number of bytes to read from disk at a time
+};
+fileGlue.tear(filePath, opts, function (err) {
   //Files have been torn apart, and written to the directory that the original file was in
 });
 ````
