@@ -13,7 +13,8 @@
   },
   "dependencies": {
     "async": ">0.1.0",
-    "vows": ">0.6.0"
+    "vows": ">0.6.0",
+    "block-stream": "0.0.6"
   },
   "devDependencies": {},
   "optionalDependencies": {}

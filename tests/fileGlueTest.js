@@ -10,7 +10,7 @@ vows.describe('File Glue').addBatch({
   'Tearing a file apart': {
     topic: function () {
       testFilePath = path.join(testFilesDir, 'simple.txt');
-      fileGlue.tear(testFilePath, 8, this.callback);
+      fileGlue.tear(testFilePath, {tearSize: 8}, this.callback);
     },
 
     'no error': function (err) {
@@ -26,12 +26,15 @@ vows.describe('File Glue').addBatch({
         return /simple\.txt\.000\d\.chunk/.test(file);
       });
 
-      assert.equal(createdFiles.length, 10, 'Expected 10 file chunks');
+      assert.equal(createdFiles.length, 10);
+    },
 
-      for (var i = 0; i < createdFiles.length; i++) {
-        var chunkPath = path.join(testFilesDir, createdFiles[i]);
-        fs.unlinkSync(chunkPath);
-      }
+    'File contents are correct': function () {
+      var fileChunk = fs.readFileSync(path.join(testFilesDir, 'simple.txt.0000.chunk'), 'utf8');
+      assert.equal(fileChunk, 'Hello, t');
+
+      fileChunk = fs.readFileSync(path.join(testFilesDir, 'simple.txt.0001.chunk'), 'utf8');
+      assert.equal(fileChunk, 'his is a');
     }
   },
 
@@ -50,8 +53,7 @@ vows.describe('File Glue').addBatch({
           return self.callback(err);
         }
 
-        var createdFile = path.join(testFilesDir, 'rando.txt');
-        fs.readFile(createdFile, 'utf8', self.callback);
+        fs.readFile(outputPath, 'utf8', self.callback);
       });
     },
 
