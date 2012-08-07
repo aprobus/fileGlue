@@ -12,9 +12,10 @@
     "node": ">=0.7.7"
   },
   "dependencies": {
-    "async": ">0.1.0",
+    "async": ">0.1.0"
+  },
+  "devDependencies": {
     "vows": ">0.6.0"
   },
-  "devDependencies": {},
   "optionalDependencies": {}
 }
