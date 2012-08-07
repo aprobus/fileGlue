@@ -7,10 +7,10 @@ var fs = require('fs');
 var testFilesDir = path.join(__dirname, 'testFiles');
 
 vows.describe('File Glue').addBatch({
-  'Tearing a file apart': {
+  'Tearing a file apart with tear size < read size': {
     topic: function () {
       testFilePath = path.join(testFilesDir, 'simple.txt');
-      fileGlue.tear(testFilePath, {tearSize: 8}, this.callback);
+      fileGlue.tear(testFilePath, {tearSize: 8, readSize: 16}, this.callback);
     },
 
     'no error': function (err) {
@@ -35,6 +35,37 @@ vows.describe('File Glue').addBatch({
 
       fileChunk = fs.readFileSync(path.join(testFilesDir, 'simple.txt.0001.chunk'), 'utf8');
       assert.equal(fileChunk, 'his is a');
+    }
+  },
+
+  'Tearing a file apart with tear size > read size': {
+    topic: function () {
+      testFilePath = path.join(testFilesDir, 'tearTest.txt');
+      fileGlue.tear(testFilePath, {tearSize: 16, readSize: 4}, this.callback);
+    },
+
+    'no error': function (err) {
+      assert.ok(!err, 'Error tearing a file apart');
+    },
+
+    '12 files created': function () {
+      var files = fs.readdirSync(testFilesDir)
+
+      assert.ok(files.length > 0, 'No files found when tearing a file');
+
+      var createdFiles = files.filter(function (file) {
+        return /tearTest\.txt\.\d{4}\.chunk/.test(file);
+      });
+
+      assert.equal(createdFiles.length, 12);
+    },
+
+    'File contents are correct': function () {
+      var fileChunk = fs.readFileSync(path.join(testFilesDir, 'tearTest.txt.0000.chunk'), 'utf8');
+      assert.equal(fileChunk, 'This file is int');
+
+      fileChunk = fs.readFileSync(path.join(testFilesDir, 'tearTest.txt.0001.chunk'), 'utf8');
+      assert.equal(fileChunk, 'ended to be torn');
     }
   },
 
