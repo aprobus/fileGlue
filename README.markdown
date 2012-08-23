@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/aprobus/fileGlue.png)](http://travis-ci.org/aprobus/fileGlue)
 #fileGlue
 FileGlue is a nodejs module for splitting files into smaller chunks, and then reconstructing them again. In the process,
 there should be no changes to the contents of the file.
