@@ -2,7 +2,7 @@
   "author": "Aaron Probus",
   "name": "fileGlue",
   "description": "Module for both splitting files into smaller pieces, and combining them back together again",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "main": "./index",
   "repository": {
     "type": "git",
