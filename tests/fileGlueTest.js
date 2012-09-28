@@ -5,6 +5,7 @@ var fileGlue = require('../lib/fileGlue');
 var fs = require('fs');
 
 var testFilesDir = path.join(__dirname, 'testFiles');
+var testOutputDir = path.join(__dirname, 'testOutput');
 
 vows.describe('File Glue').addBatch({
   'Tearing a file apart with tear size < read size': {
@@ -77,7 +78,7 @@ vows.describe('File Glue').addBatch({
         path.join(testFilesDir, 'randoChunk2.txt')
       ];
 
-      var outputPath = path.join(testFilesDir, 'rando.txt');
+      var outputPath = path.join(testOutputDir, 'rando.txt');
 
       fileGlue.glue(fileChunks, outputPath, function (err) {
         if (err) {
@@ -96,8 +97,178 @@ vows.describe('File Glue').addBatch({
       assert.ok(data);
       assert.equal(data, 'This isa test.');
 
-      var createdFile = path.join(testFilesDir, 'rando.txt');
+      var createdFile = path.join(testOutputDir, 'rando.txt');
       fs.unlinkSync(createdFile);
+    }
+  },
+
+  'Gluing a file together with event emitter': {
+    topic: function () {
+      var self = this;
+      var fileChunks = [
+        path.join(testFilesDir, 'randoChunk1.txt'),
+        path.join(testFilesDir, 'randoChunk2.txt')
+      ];
+
+      var outputPath = path.join(testOutputDir, 'rando2.txt');
+      var fileGluer = fileGlue.glue(fileChunks, outputPath);
+
+      var events = [];
+
+      fileGluer.on('progress', function (filePath) {
+        events.push({type: 'progress', data: filePath});
+      });
+
+      fileGluer.on('error', function (err) {
+        events.push({type: 'error', data: err});
+        onComplete();
+      });
+
+      fileGluer.on('end', function () {
+        events.push({type: 'end', data: null});
+        onComplete();
+      });
+
+      function onComplete () {
+        self.callback(null, events, fs.readFileSync(outputPath, 'utf8'));
+      }
+    },
+
+    'No errors': function (events) {
+      assert.ok(events);
+
+      var errorEvents = events.filter(function (event) {
+        return event.type === 'error';
+      });
+
+      assert.equal(errorEvents.length, 0);
+    },
+
+    'Two progress events': function (events) {
+      assert.ok(events);
+
+      var progressEvents = events.filter(function (event) {
+        return event.type === 'progress';
+      });
+
+      assert.equal(progressEvents.length, 2);
+      assert.ok(/randoChunk1\.txt/.test(progressEvents[0].data));
+      assert.ok(/randoChunk2\.txt/.test(progressEvents[1].data));
+    },
+
+    'Emitted an end event': function (events) {
+      assert.ok(events);
+
+      var endEvents = events.filter(function (event) {
+        return event.type === 'end';
+      });
+
+      assert.equal(endEvents.length, 1);
+    },
+
+    'contents are correct': function (err, events, data) {
+      assert.ok(data);
+      assert.equal(data, 'This isa test.');
+
+      var createdFile = path.join(testOutputDir, 'rando2.txt');
+      fs.unlinkSync(createdFile);
+    }
+  },
+
+  'Gluing a file together with event emitter invalid files': {
+    topic: function () {
+      var self = this;
+      var fileChunks = [
+        path.join(testFilesDir, 'randoChunkasdfasdf.txt'),
+        path.join(testFilesDir, 'randoChunkkjasdjk.txt')
+      ];
+
+      var outputPath = path.join(testOutputDir, 'rando3.txt');
+      var fileGluer = fileGlue.glue(fileChunks, outputPath);
+
+      var events = [];
+
+      fileGluer.on('progress', function (filePath) {
+        events.push({type: 'progress', data: filePath});
+      });
+
+      fileGluer.on('error', function (err) {
+        events.push({type: 'error', data: err});
+        onComplete();
+      });
+
+      fileGluer.on('end', function () {
+        events.push({type: 'end', data: null});
+        onComplete();
+      });
+
+      function onComplete () {
+        self.callback(null, events);
+      }
+    },
+
+    'Error emitted': function (events) {
+      assert.ok(events);
+
+      var errorEvents = events.filter(function (event) {
+        return event.type === 'error';
+      });
+
+      assert.equal(errorEvents.length, 1);
+    }
+  },
+
+  'Invalid args callback': {
+    topic: function () {
+      var self = this;
+      var outputPath = path.join(testOutputDir, 'rando.txt');
+
+      fileGlue.glue(null, outputPath, function (err) {
+        return self.callback(null, err);
+      });
+    },
+
+    'Invalid args error': function (err) {
+      assert.ok(err);
+    }
+  },
+
+  'Invalid args event emitter': {
+    topic: function () {
+      var self = this;
+
+      var outputPath = path.join(testOutputDir, 'rando3.txt');
+      var fileGluer = fileGlue.glue(null, outputPath);
+
+      var events = [];
+
+      fileGluer.on('progress', function (filePath) {
+        events.push({type: 'progress', data: filePath});
+      });
+
+      fileGluer.on('error', function (err) {
+        events.push({type: 'error', data: err});
+        onComplete();
+      });
+
+      fileGluer.on('end', function () {
+        events.push({type: 'end', data: null});
+        onComplete();
+      });
+
+      function onComplete () {
+        self.callback(null, events);
+      }
+    },
+
+    'Error emitted': function (events) {
+      assert.ok(events);
+
+      var errorEvents = events.filter(function (event) {
+        return event.type === 'error';
+      });
+
+      assert.equal(errorEvents.length, 1);
     }
   }
 }).run();
