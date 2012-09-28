@@ -10,6 +10,7 @@ With callback
 ````javascript
 var fileGlue = require('fileGlue');
 
+var filePaths = ['/input/file1.txt', '/input/file2.txt']; //IMPORTANT: Files will be combined in the order they appear here
 fileGlue.glue(filePaths, outputFilePath, function (err) {
   //Files have now been 'glued' together, and written to outputFilePath
 });
